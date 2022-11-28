@@ -1,7 +1,9 @@
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import Banner from "../components/Banner";
+import Banner from "../components/Banner/Banner";
+import Card from "../components/Card/CardComponent";
+import { coffeeStoreData } from "../Data/coffee-store.js";
 
 export default function Home() {
   const handleOnBannerBtnClick = () => {
@@ -23,6 +25,19 @@ export default function Home() {
         />
         <div className={styles.heroImage}>
           <Image src="/static/hero-image.png" width={700} height={400} />
+        </div>
+
+        <div className={styles.cardLayout}>
+          {coffeeStoreData.map((element, index) => {
+            return (
+              <Card
+                name={element.name}
+                imgUrl={element.imgUrl}
+                href={`/coffee-store/${element.id}`}
+                className={styles.card}
+              />
+            );
+          })}
         </div>
       </main>
 

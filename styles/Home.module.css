@@ -21,12 +21,14 @@
 
 .cardLayout {
   display: grid;
+  justify-content: center;
   grid-template-columns: repeat(1, minmax(0, 1fr));
   column-gap: 1.5rem;
   row-gap: 1.5rem;
 }
 
 .card {
+  margin-top: 100px;
   justify-content: center;
 }
 
@@ -44,8 +46,17 @@
 
 .heroImage {
   position: absolute;
-  top: 0px;
+  top: 1px;
   z-index: 1;
+}
+.cardLayout {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  column-gap: 1.5rem;
+  row-gap: 1.5rem;
+}
+.card {
+  justify-content: center;
 }
 
 /** Breakpoints:
