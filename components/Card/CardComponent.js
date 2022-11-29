@@ -1,9 +1,4 @@
 import React from "react";
-import {
-  EditOutlined,
-  EllipsisOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
 import { Avatar, Card } from "antd";
 const { Meta } = Card;
 import Link from "next/link";
@@ -16,17 +11,22 @@ const CardComponent = ({ name, imgUrl, href, className }) => {
     <div className={className}>
       <Card
         style={{
-          width: 300,
+          width: 280,
+          // height: 280,
         }}
-        cover={<Image src={imgUrl} width={200} height={160} />}
-        actions={[
-          <SettingOutlined key="setting" />,
-          <EditOutlined key="edit" />,
-          <EllipsisOutlined key="ellipsis" />,
-        ]}
+        cover={
+          <Link href={href}>
+            <Image
+              src={imgUrl}
+              width={280}
+              height={220}
+              alt="image not found"
+            />
+          </Link>
+        }
       >
         <Meta
-          avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
+          // avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
           title={name}
           description="This is the description"
         />

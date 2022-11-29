@@ -5,10 +5,16 @@ import Banner from "../components/Banner/Banner";
 import Card from "../components/Card/CardComponent";
 import { coffeeStoreData } from "../Data/coffee-store.js";
 
-export default function Home() {
+export async function getStaticProps(context) {
+  return {
+    props: { coffeeStores: coffeeStoreData }, // will be passed to the page component as props
+  };
+}
+export default function Home(props) {
   const handleOnBannerBtnClick = () => {
     console.log("hii banner button click");
   };
+  console.log("props:", props);
   return (
     <div className={styles.container}>
       <Head>
@@ -24,21 +30,31 @@ export default function Home() {
           handleOnClick={handleOnBannerBtnClick}
         />
         <div className={styles.heroImage}>
-          <Image src="/static/hero-image.png" width={700} height={400} />
+          <Image
+            src="/static/hero-image.png"
+            width={700}
+            height={400}
+            alt="hero-image"
+          />
         </div>
-
-        <div className={styles.cardLayout}>
-          {coffeeStoreData.map((element, index) => {
-            return (
-              <Card
-                name={element.name}
-                imgUrl={element.imgUrl}
-                href={`/coffee-store/${element.id}`}
-                className={styles.card}
-              />
-            );
-          })}
-        </div>
+        {props.coffeeStores.length > 0 && (
+          <>
+            <h2 className={styles.heading2}>Toronto Stores</h2>
+            <div className={styles.cardLayout}>
+              {props.coffeeStores?.map((element, index) => {
+                return (
+                  <Card
+                    key={index}
+                    name={element.name}
+                    imgUrl={element.imgUrl}
+                    href={`/coffee-store/${element.id}`}
+                    className={styles.card}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
       </main>
 
       {/*<footer className={styles.footer}></footer>*/}
