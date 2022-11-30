@@ -14,7 +14,6 @@ export default function Home(props) {
   const handleOnBannerBtnClick = () => {
     console.log("hii banner button click");
   };
-  console.log("props:", props);
   return (
     <div className={styles.container}>
       <Head>
