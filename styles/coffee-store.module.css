@@ -1,0 +1,56 @@
+.containerWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.backContainer {
+  width: 50%;
+}
+.arrowContainer {
+  font-size: 25px;
+  padding: 5px;
+}
+.nameWrapper {
+  color: #ffffff;
+  padding: 5px;
+}
+.informContainer {
+  /*padding: 10px;*/
+  display: flex;
+  width: 70%;
+  gap: 2%;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.imageContainer {
+  padding: 10px;
+}
+.detailWrapper {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  /*height: 400px;*/
+  padding: 20px;
+  font-size: 30px;
+}
+.listWrapper {
+  padding: 10px;
+}
+.upvoteButton {
+  background-color: var(--text-purple-dark);
+  cursor: pointer;
+  color: white;
+  outline: 0;
+  border: 1px;
+  padding: 1rem 2.5rem 1rem 2.5rem;
+  font-size: 1.125rem /* 18px */;
+}
+.upvoteButton:hover {
+  background-color: var(--text-purple-dark);
+}
