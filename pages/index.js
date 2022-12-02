@@ -4,16 +4,21 @@ import styles from "../styles/Home.module.css";
 import Banner from "../components/Banner/Banner";
 import Card from "../components/Card/CardComponent";
 import { coffeeStoreData } from "../Data/coffee-store.js";
+import React, { useState } from "react";
+import { fetchAllCoffeeStore } from "../lib/coffeeStoreLibrary";
 
 export async function getStaticProps(context) {
+  const data = await fetchAllCoffeeStore();
   return {
-    props: { coffeeStores: coffeeStoreData }, // will be passed to the page component as props
+    props: { coffeeStores: data.results, message: "hello" }, // will be passed to the page component as props
   };
 }
 export default function Home(props) {
   const handleOnBannerBtnClick = () => {
     console.log("hii banner button click");
   };
+  console.log("props:", props.coffeeStores);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -45,8 +50,11 @@ export default function Home(props) {
                   <Card
                     key={index}
                     name={element.name}
-                    imgUrl={element.imgUrl}
-                    href={`/coffee-store/${element.id}`}
+                    imgUrl={
+                      element.imgUrl ||
+                      "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+                    }
+                    href={`/coffee-store/${element.fsq_id}`}
                     className={styles.card}
                   />
                 );

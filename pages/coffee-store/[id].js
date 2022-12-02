@@ -9,18 +9,23 @@ import ArrowLeftOutlined from "@ant-design/icons/lib/icons/ArrowLeftOutlined";
 import StarFilled from "@ant-design/icons/lib/icons/StarFilled";
 import NearMe from "../../public/static/icons/nearMe.svg";
 import Location from "../../public/static/icons/location.svg";
+import { fetchAllCoffeeStore } from "../../lib/coffeeStoreLibrary";
 
-export function getStaticProps(staticProps) {
+export async function getStaticProps(staticProps) {
   const params = staticProps.params;
+  // const data = fetchDetailCoffeeStore(params?.id);
+  const coffeeStores = await fetchAllCoffeeStore();
   return {
     props: {
       coffeeStore: coffeeStoreData?.find((element) => {
-        return element.id.toString() === params?.id; //dynamic id
+        return element.fsq_id.toString() === params?.id; //dynamic id
       }),
     },
   };
 }
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const coffeeStores = await fetchAllCoffeeStore();
+  console.log("coffeestore:", coffeeStores);
   const paths = coffeeStoreData.map((element) => {
     return {
       params: {
@@ -36,9 +41,11 @@ export function getStaticPaths() {
 
 const CoffeeStore = (props) => {
   const router = useRouter();
+  console.log("router:", router);
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
+  console.log("props:", props);
   const { name, address, neighbourhood, imgUrl } = props?.coffeeStore;
 
   const handleUpvoteButton = () => {
@@ -61,7 +68,15 @@ const CoffeeStore = (props) => {
       </div>
       <div className={styles.informContainer}>
         <div className={styles.imageContainer}>
-          <Image src={imgUrl} width={500} height={400} alt={name} />
+          <Image
+            src={
+              imgUrl ||
+              "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+            }
+            width={500}
+            height={400}
+            alt={name}
+          />
         </div>
         <div className={styles.detailWrapper}>
           <div className={styles.listWrapper}>
