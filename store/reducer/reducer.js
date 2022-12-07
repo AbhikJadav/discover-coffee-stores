@@ -16,7 +16,7 @@ const reducer = (state = initialState, action) => {
     case Types.SET_COFFEE_STORE:
       return {
         ...state,
-        count: action.payload,
+        coffeeStore: action.payload,
       };
 
     default:

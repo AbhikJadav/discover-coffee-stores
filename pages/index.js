@@ -7,26 +7,34 @@ import { coffeeStoreData } from "../Data/coffee-store.js";
 import React, { useEffect, useState } from "react";
 import { fetchAllCoffeeStore } from "../lib/coffeeStoreLibrary";
 import useTrackLocation from "../hooks/useTrackLocation";
+import { useDispatch, useSelector } from "react-redux";
+import { setCoffeeStore } from "../store/action/action";
 
 export async function getStaticProps(context) {
-  const data = await fetchAllCoffeeStore();
+  const fetchCoffeeStore = await fetchAllCoffeeStore();
   return {
-    props: { coffeeStores: data, message: "hello" }, // will be passed to the page component as props
+    props: { coffeeStores: fetchCoffeeStore, message: "hello" }, // will be passed to the page component as props
   };
 }
 const Home = (props) => {
-  const { handleTrackLocation, latLong, locationErrorMsg, isFindingLocation } =
+  const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
     useTrackLocation();
 
+  const { latLong, coffeeStore } = useSelector((state) => state.reducer);
   const [coffeeStores, setCoffeeStores] = useState("");
   const [coffeeStoreError, setCoffeeStoreError] = useState(null);
-
+  const dispatch = useDispatch();
   console.log({ latLong, locationErrorMsg });
   const locationHandler = async () => {
     try {
-      const data = await fetchAllCoffeeStore(latLong, 30);
-      setCoffeeStores(data);
-      console.log({ data });
+      const response = await fetch(
+        `/api/getCoffeeStoreByLocation?latLong=${latLong}&limit=30`
+      );
+      const coffeeStores = await response.json();
+      // setCoffeeStores(fetchCoffeeStore);
+      dispatch(setCoffeeStore(coffeeStores));
+      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStores });
+      setCoffeeStoreError("");
     } catch (error) {
       console.log({ error });
       setCoffeeStoreError(error.message);
@@ -41,7 +49,6 @@ const Home = (props) => {
     // console.log("hii banner button click");
     handleTrackLocation();
   };
-
   return (
     <div className={styles.container}>
       <Head>

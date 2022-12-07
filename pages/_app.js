@@ -4,12 +4,14 @@ import { withRouter } from "next/router";
 import "../styles/globals.css";
 import React from "react";
 import "antd/dist/reset.css";
-import store from "../store/store";
-
+import { persistor, store } from "../store/store";
+import { PersistGate } from "redux-persist/integration/react";
 function MyApp({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <Component {...pageProps} />
+      <PersistGate loading={null} persistor={persistor}>
+        <Component {...pageProps} />
+      </PersistGate>
     </Provider>
   );
 }

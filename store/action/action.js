@@ -1,4 +1,4 @@
-import { INCREMENT, DECREMENT, Types } from "../Type";
+import { Types } from "../Type";
 
 export const setLatLong = (payload) => {
   return {
@@ -7,8 +7,9 @@ export const setLatLong = (payload) => {
   };
 };
 
-export const setCoffeeStore = () => {
+export const setCoffeeStore = (payload) => {
   return {
     type: Types.SET_COFFEE_STORE,
+    payload,
   };
 };

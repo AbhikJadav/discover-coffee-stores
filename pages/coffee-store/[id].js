@@ -7,6 +7,8 @@ import cls from "classnames";
 
 import styles from "../../styles/coffee-store.module.css";
 import { fetchAllCoffeeStore } from "../../lib/coffeeStoreLibrary";
+import { useSelector } from "react-redux";
+import { isEmpty } from "../../utils";
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
@@ -35,14 +37,29 @@ export async function getStaticPaths() {
     fallback: true,
   };
 }
-const CoffeeStore = (props) => {
+const CoffeeStore = (initialprops) => {
   const router = useRouter();
+  const id = router.query.id;
+  const { coffeeStore } = useSelector((state) => state.reducer);
+  const [coffeeStoreData, setCoffeeStoreData] = useState(
+    initialprops.coffeeStore
+  );
   console.log("router:", router);
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
-  const { name, address, neighbourhood, imgUrl } = props?.coffeeStore;
-  console.log(" props?.coffeeStore:", props?.coffeeStore);
+  useEffect(() => {
+    if (isEmpty(initialprops.coffeeStore)) {
+      if (coffeeStore.length > 0) {
+        const findCoffeeStoreById = coffeeStore?.find((element) => {
+          return element.fsq_id.toString() === id; //dynamic id
+        });
+        setCoffeeStoreData(findCoffeeStoreById);
+      }
+    }
+  }, [id]);
+  const { name, address, neighbourhood, imgUrl } = coffeeStoreData;
+  console.log(" props?.coffeeStore:", initialprops?.coffeeStore);
   console.log("location:", address);
   const handleUpvoteButton = () => {
     console.log("up vote");
