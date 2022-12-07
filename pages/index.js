@@ -4,10 +4,50 @@ import styles from "../styles/Home.module.css";
 import Banner from "../components/Banner/Banner";
 import Card from "../components/Card/CardComponent";
 import { coffeeStoreData } from "../Data/coffee-store.js";
+import React, { useEffect, useState } from "react";
+import { fetchAllCoffeeStore } from "../lib/coffeeStoreLibrary";
+import useTrackLocation from "../hooks/useTrackLocation";
+import { useDispatch, useSelector } from "react-redux";
+import { setCoffeeStore } from "../store/action/action";
 
-export default function Home() {
+export async function getStaticProps(context) {
+  const fetchCoffeeStore = await fetchAllCoffeeStore();
+  return {
+    props: { coffeeStores: fetchCoffeeStore, message: "hello" }, // will be passed to the page component as props
+  };
+}
+const Home = (props) => {
+  const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
+    useTrackLocation();
+
+  const { latLong, coffeeStore } = useSelector((state) => state.reducer);
+  const [coffeeStores, setCoffeeStores] = useState("");
+  const [coffeeStoreError, setCoffeeStoreError] = useState(null);
+  const dispatch = useDispatch();
+  console.log({ latLong, locationErrorMsg });
+  const locationHandler = async () => {
+    try {
+      const response = await fetch(
+        `/api/getCoffeeStoreByLocation?latLong=${latLong}&limit=30`
+      );
+      const coffeeStores = await response.json();
+      // setCoffeeStores(fetchCoffeeStore);
+      dispatch(setCoffeeStore(coffeeStores));
+      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStores });
+      setCoffeeStoreError("");
+    } catch (error) {
+      console.log({ error });
+      setCoffeeStoreError(error.message);
+    }
+  };
+  useEffect(() => {
+    if (latLong) {
+      locationHandler();
+    }
+  }, [latLong]);
   const handleOnBannerBtnClick = () => {
-    console.log("hii banner button click");
+    // console.log("hii banner button click");
+    handleTrackLocation();
   };
   return (
     <div className={styles.container}>
@@ -20,28 +60,66 @@ export default function Home() {
       <main className={styles.main}>
         {/*<h1 className={styles.title}>Coffee Connoissuer</h1>*/}
         <Banner
-          buttonText={"View stores nearby"}
+          buttonText={isFindingLocation ? "Locating..." : "View stores nearby"}
           handleOnClick={handleOnBannerBtnClick}
         />
+        {locationErrorMsg && <p>Something went wrong:{locationErrorMsg}</p>}
+        {coffeeStoreError && <p>Something went wrong:{coffeeStoreError}</p>}
         <div className={styles.heroImage}>
-          <Image src="/static/hero-image.png" width={700} height={400} />
+          <Image
+            src="/static/hero-image.png"
+            width={700}
+            height={400}
+            alt="hero-image"
+          />
         </div>
+        {coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Stores Near Me</h2>
+            <div className={styles.cardLayout}>
+              {coffeeStores?.map((element, index) => {
+                return (
+                  <Card
+                    key={index}
+                    name={element.name}
+                    imgUrl={
+                      element.imgUrl ||
+                      "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+                    }
+                    href={`/coffee-store/${element.fsq_id}`}
+                    className={styles.card}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
 
-        <div className={styles.cardLayout}>
-          {coffeeStoreData.map((element, index) => {
-            return (
-              <Card
-                name={element.name}
-                imgUrl={element.imgUrl}
-                href={`/coffee-store/${element.id}`}
-                className={styles.card}
-              />
-            );
-          })}
-        </div>
+        {props.coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Toronto Stores</h2>
+            <div className={styles.cardLayout}>
+              {props.coffeeStores?.map((element, index) => {
+                return (
+                  <Card
+                    key={index}
+                    name={element.name}
+                    imgUrl={
+                      element.imgUrl ||
+                      "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80"
+                    }
+                    href={`/coffee-store/${element.fsq_id}`}
+                    className={styles.card}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
 
       {/*<footer className={styles.footer}></footer>*/}
     </div>
   );
-}
+};
+export default Home;
