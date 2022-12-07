@@ -21,7 +21,6 @@ const Home = (props) => {
     useTrackLocation();
 
   const { latLong, coffeeStore } = useSelector((state) => state.reducer);
-  const [coffeeStores, setCoffeeStores] = useState("");
   const [coffeeStoreError, setCoffeeStoreError] = useState(null);
   const dispatch = useDispatch();
   console.log({ latLong, locationErrorMsg });
@@ -30,10 +29,10 @@ const Home = (props) => {
       const response = await fetch(
         `/api/getCoffeeStoreByLocation?latLong=${latLong}&limit=30`
       );
-      const coffeeStores = await response.json();
+      const coffeeStoresData = await response.json();
       // setCoffeeStores(fetchCoffeeStore);
-      dispatch(setCoffeeStore(coffeeStores));
-      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStores });
+      dispatch(setCoffeeStore(coffeeStoresData));
+      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStoresData });
       setCoffeeStoreError("");
     } catch (error) {
       console.log({ error });
@@ -73,11 +72,11 @@ const Home = (props) => {
             alt="hero-image"
           />
         </div>
-        {coffeeStores.length > 0 && (
+        {coffeeStore.length > 0 && (
           <div className={styles.sectionWrapper}>
             <h2 className={styles.heading2}>Stores Near Me</h2>
             <div className={styles.cardLayout}>
-              {coffeeStores?.map((element, index) => {
+              {coffeeStore?.map((element, index) => {
                 return (
                   <Card
                     key={index}

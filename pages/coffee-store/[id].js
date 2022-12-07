@@ -48,13 +48,40 @@ const CoffeeStore = (initialprops) => {
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
+
+  const handleCreateCoffeeStore = async (coffeeStoreFromContext) => {
+    try {
+      const { fsq_id, name, address, neighbourhood, imgUrl } =
+        coffeeStoreFromContext;
+      const response = await fetch(`/api/createCoffeeStore`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Neighbourhood: neighbourhood || "",
+          Id: fsq_id,
+          Name: name,
+          Voting: 0,
+          Address: address || "",
+          ImageUrl: imgUrl,
+        }),
+      });
+      const dbCoffeeStore = await response.json();
+      console.log("dbCoffeeStore:", dbCoffeeStore);
+    } catch (error) {
+      console.log("Error creating a coffee store", error);
+    }
+  };
+
   useEffect(() => {
     if (isEmpty(initialprops.coffeeStore)) {
       if (coffeeStore.length > 0) {
-        const findCoffeeStoreById = coffeeStore?.find((element) => {
+        const coffeeStoreFromContext = coffeeStore?.find((element) => {
           return element.fsq_id.toString() === id; //dynamic id
         });
-        setCoffeeStoreData(findCoffeeStoreById);
+        setCoffeeStoreData(coffeeStoreFromContext);
+        handleCreateCoffeeStore(coffeeStoreFromContext);
       }
     }
   }, [id]);
