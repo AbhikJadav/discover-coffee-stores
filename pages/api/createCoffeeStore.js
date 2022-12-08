@@ -1,51 +1,52 @@
-import { getMiniFiedRecords, table } from "./airTable";
+import React from "react";
+import {
+  findRecordsByFilter,
+  getMiniFiedRecords,
+  table,
+} from "../../lib/airTable";
 
-const createStore = async (req, res) => {
+const CreateCoffeeStore = async (req, res) => {
   if (req.method === "POST") {
-    //find record is available or not!!
-    const { Id, Name, Address, ImageUrl, Neighbourhood, Voting } = req.body;
+    // find record available or not
+    const { id, name, neighbourhood, address, voting, imgUrl } = req.body;
     try {
-      if (Id) {
-        const findCoffeeStore = await table
-          .select({
-            filterByFormula: `id="${Id}"`,
-          })
-          .firstPage();
-        if (findCoffeeStore.length !== 0) {
-          const records = getMiniFiedRecords(findCoffeeStore);
+      if (id) {
+        const records = await findRecordsByFilter(id);
+        if (records.length !== 0) {
           res.json(records);
         } else {
           //create record
-          if (Name) {
-            const createRecord = await table.create([
+
+          if (name) {
+            const createRecords = await table.create([
               {
                 fields: {
-                  Neighbourhood,
-                  Id,
-                  Name,
-                  Voting,
-                  Address,
-                  ImageUrl,
+                  id,
+                  name,
+                  address,
+                  neighbourhood,
+                  voting,
+                  imgUrl,
                 },
               },
             ]);
-            const records = getMiniFiedRecords(createRecord);
+            const records = getMiniFiedRecords(createRecords);
             res.json(records);
           } else {
             res.status(400);
-            res.json({ message: "name is missing" });
+            res.json({ message: "Name is missing" });
           }
         }
       } else {
         res.status(400);
-        res.json({ message: "id is missing" });
+        res.json({ message: "Id is missing" });
       }
     } catch (error) {
-      console.log("Error creating or finding store:", error);
+      console.error("Something went wrong:", error);
       res.status(500);
-      res.json({ message: "Error creating or finding store" }, error);
+      res.json({ message: "Error finding or creating store", error });
     }
   }
 };
 
-export default createStore;
+export default CreateCoffeeStore;

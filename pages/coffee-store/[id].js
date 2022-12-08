@@ -4,11 +4,11 @@ import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
 import cls from "classnames";
-
 import styles from "../../styles/coffee-store.module.css";
 import { fetchAllCoffeeStore } from "../../lib/coffeeStoreLibrary";
 import { useSelector } from "react-redux";
-import { isEmpty } from "../../utils";
+import { fetcher, isEmpty } from "../../utils";
+import useSWR from "swr";
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
@@ -24,7 +24,6 @@ export async function getStaticProps(staticProps) {
 }
 export async function getStaticPaths() {
   const coffeeStores = await fetchAllCoffeeStore();
-  console.log("coffeestore:", coffeeStores);
   const paths = coffeeStores?.map((element) => {
     return {
       params: {
@@ -44,7 +43,6 @@ const CoffeeStore = (initialprops) => {
   const [coffeeStoreData, setCoffeeStoreData] = useState(
     initialprops.coffeeStore
   );
-  console.log("router:", router);
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -59,16 +57,15 @@ const CoffeeStore = (initialprops) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Neighbourhood: neighbourhood || "",
-          Id: fsq_id,
-          Name: name,
-          Voting: 0,
-          Address: address || "",
-          ImageUrl: imgUrl,
+          neighbourhood: neighbourhood || "",
+          id: fsq_id,
+          name,
+          voting: 0,
+          address: address || "",
+          imgUrl,
         }),
       });
       const dbCoffeeStore = await response.json();
-      console.log("dbCoffeeStore:", dbCoffeeStore);
     } catch (error) {
       console.log("Error creating a coffee store", error);
     }
@@ -80,17 +77,50 @@ const CoffeeStore = (initialprops) => {
         const coffeeStoreFromContext = coffeeStore?.find((element) => {
           return element.fsq_id.toString() === id; //dynamic id
         });
-        setCoffeeStoreData(coffeeStoreFromContext);
-        handleCreateCoffeeStore(coffeeStoreFromContext);
+        if (coffeeStoreFromContext) {
+          setCoffeeStoreData(coffeeStoreFromContext);
+          handleCreateCoffeeStore(coffeeStoreFromContext);
+        }
       }
+    } else {
+      handleCreateCoffeeStore(initialprops.coffeeStore);
     }
-  }, [id]);
+  }, [id, initialprops, initialprops.coffeeStore]);
   const { name, address, neighbourhood, imgUrl } = coffeeStoreData;
-  console.log(" props?.coffeeStore:", initialprops?.coffeeStore);
-  console.log("location:", address);
-  const handleUpvoteButton = () => {
-    console.log("up vote");
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
+  const [votingCount, setVotingCount] = useState(0);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setCoffeeStoreData(data[0]);
+      setVotingCount(data[0].voting);
+    }
+  }, [data]);
+  console.log("data:", data);
+  const handleUpvoteButton = async () => {
+    try {
+      const response = await fetch(`/api/faviouriteCoffeeStoreById`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+        }),
+      });
+      const dbCoffeeStore = await response.json();
+      if (dbCoffeeStore && dbCoffeeStore.length > 0) {
+        let count = votingCount + 1;
+        setVotingCount(count);
+      }
+    } catch (error) {
+      console.log("Error creating a coffee store", error);
+    }
   };
+  if (error) {
+    return <div>Something went wrong retrieving coffee store page</div>;
+  }
+  console.log("imgurl:", imgUrl);
   return (
     <div className={styles.layout}>
       <Head>
@@ -146,7 +176,7 @@ const CoffeeStore = (initialprops) => {
               height="24"
               alt="star icon"
             />
-            <p className={styles.text}>10</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
 
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>
