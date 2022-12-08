@@ -3,7 +3,6 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Banner from "../components/Banner/Banner";
 import Card from "../components/Card/CardComponent";
-import { coffeeStoreData } from "../Data/coffee-store.js";
 import React, { useEffect, useState } from "react";
 import { fetchAllCoffeeStore } from "../lib/coffeeStoreLibrary";
 import useTrackLocation from "../hooks/useTrackLocation";
@@ -23,7 +22,6 @@ const Home = (props) => {
   const { latLong, coffeeStore } = useSelector((state) => state.reducer);
   const [coffeeStoreError, setCoffeeStoreError] = useState(null);
   const dispatch = useDispatch();
-  console.log({ latLong, locationErrorMsg });
   const locationHandler = async () => {
     try {
       const response = await fetch(
@@ -32,10 +30,8 @@ const Home = (props) => {
       const coffeeStoresData = await response.json();
       // setCoffeeStores(fetchCoffeeStore);
       dispatch(setCoffeeStore(coffeeStoresData));
-      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStoresData });
       setCoffeeStoreError("");
     } catch (error) {
-      console.log({ error });
       setCoffeeStoreError(error.message);
     }
   };
@@ -45,7 +41,6 @@ const Home = (props) => {
     }
   }, [latLong]);
   const handleOnBannerBtnClick = () => {
-    // console.log("hii banner button click");
     handleTrackLocation();
   };
   return (
@@ -116,8 +111,6 @@ const Home = (props) => {
           </div>
         )}
       </main>
-
-      {/*<footer className={styles.footer}></footer>*/}
     </div>
   );
 };

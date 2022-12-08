@@ -1,6 +1,4 @@
-import withRedux from "next-redux-wrapper";
 import { Provider } from "react-redux";
-import { withRouter } from "next/router";
 import "../styles/globals.css";
 import React from "react";
 import "antd/dist/reset.css";
