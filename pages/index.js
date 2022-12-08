@@ -3,7 +3,6 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Banner from "../components/Banner/Banner";
 import Card from "../components/Card/CardComponent";
-import { coffeeStoreData } from "../Data/coffee-store.js";
 import React, { useEffect, useState } from "react";
 import { fetchAllCoffeeStore } from "../lib/coffeeStoreLibrary";
 import useTrackLocation from "../hooks/useTrackLocation";
@@ -21,22 +20,18 @@ const Home = (props) => {
     useTrackLocation();
 
   const { latLong, coffeeStore } = useSelector((state) => state.reducer);
-  const [coffeeStores, setCoffeeStores] = useState("");
   const [coffeeStoreError, setCoffeeStoreError] = useState(null);
   const dispatch = useDispatch();
-  console.log({ latLong, locationErrorMsg });
   const locationHandler = async () => {
     try {
       const response = await fetch(
         `/api/getCoffeeStoreByLocation?latLong=${latLong}&limit=30`
       );
-      const coffeeStores = await response.json();
+      const coffeeStoresData = await response.json();
       // setCoffeeStores(fetchCoffeeStore);
-      dispatch(setCoffeeStore(coffeeStores));
-      console.log("fetch coffee store fetchCoffeeStore:", { coffeeStores });
+      dispatch(setCoffeeStore(coffeeStoresData));
       setCoffeeStoreError("");
     } catch (error) {
-      console.log({ error });
       setCoffeeStoreError(error.message);
     }
   };
@@ -46,7 +41,6 @@ const Home = (props) => {
     }
   }, [latLong]);
   const handleOnBannerBtnClick = () => {
-    // console.log("hii banner button click");
     handleTrackLocation();
   };
   return (
@@ -73,11 +67,11 @@ const Home = (props) => {
             alt="hero-image"
           />
         </div>
-        {coffeeStores.length > 0 && (
+        {coffeeStore.length > 0 && (
           <div className={styles.sectionWrapper}>
             <h2 className={styles.heading2}>Stores Near Me</h2>
             <div className={styles.cardLayout}>
-              {coffeeStores?.map((element, index) => {
+              {coffeeStore?.map((element, index) => {
                 return (
                   <Card
                     key={index}
@@ -117,8 +111,6 @@ const Home = (props) => {
           </div>
         )}
       </main>
-
-      {/*<footer className={styles.footer}></footer>*/}
     </div>
   );
 };
