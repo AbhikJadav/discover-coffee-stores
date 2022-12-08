@@ -96,7 +96,6 @@ const CoffeeStore = (initialprops) => {
       setVotingCount(data[0].voting);
     }
   }, [data]);
-  console.log("data:", data);
   const handleUpvoteButton = async () => {
     try {
       const response = await fetch(`/api/faviouriteCoffeeStoreById`, {
@@ -120,7 +119,6 @@ const CoffeeStore = (initialprops) => {
   if (error) {
     return <div>Something went wrong retrieving coffee store page</div>;
   }
-  console.log("imgurl:", imgUrl);
   return (
     <div className={styles.layout}>
       <Head>
