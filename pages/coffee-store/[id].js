@@ -43,6 +43,31 @@ const CoffeeStore = (initialprops) => {
   const [coffeeStoreData, setCoffeeStoreData] = useState(
     initialprops.coffeeStore
   );
+  useEffect(() => {
+    if (isEmpty(initialprops.coffeeStore)) {
+      if (coffeeStore.length > 0) {
+        const coffeeStoreFromContext = coffeeStore?.find((element) => {
+          return element.fsq_id.toString() === id; //dynamic id
+        });
+        if (coffeeStoreFromContext) {
+          setCoffeeStoreData(coffeeStoreFromContext);
+          handleCreateCoffeeStore(coffeeStoreFromContext);
+        }
+      }
+    } else {
+      handleCreateCoffeeStore(initialprops.coffeeStore);
+    }
+  }, [id, initialprops, initialprops.coffeeStore, coffeeStore]);
+  const { name, address, neighbourhood, imgUrl } = coffeeStoreData;
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
+  const [votingCount, setVotingCount] = useState(0);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setCoffeeStoreData(data[0]);
+      setVotingCount(data[0].voting);
+    }
+  }, [data]);
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -71,31 +96,6 @@ const CoffeeStore = (initialprops) => {
     }
   };
 
-  useEffect(() => {
-    if (isEmpty(initialprops.coffeeStore)) {
-      if (coffeeStore.length > 0) {
-        const coffeeStoreFromContext = coffeeStore?.find((element) => {
-          return element.fsq_id.toString() === id; //dynamic id
-        });
-        if (coffeeStoreFromContext) {
-          setCoffeeStoreData(coffeeStoreFromContext);
-          handleCreateCoffeeStore(coffeeStoreFromContext);
-        }
-      }
-    } else {
-      handleCreateCoffeeStore(initialprops.coffeeStore);
-    }
-  }, [id, initialprops, initialprops.coffeeStore]);
-  const { name, address, neighbourhood, imgUrl } = coffeeStoreData;
-  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
-  const [votingCount, setVotingCount] = useState(0);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setCoffeeStoreData(data[0]);
-      setVotingCount(data[0].voting);
-    }
-  }, [data]);
   const handleUpvoteButton = async () => {
     try {
       const response = await fetch(`/api/faviouriteCoffeeStoreById`, {
